@@ -4,10 +4,6 @@ services:
     build:
       context: ./frontend # Point to the frontend folder
       dockerfile: Dockerfile # Use the Dockerfile in the frontend folder
-    ports:
-      - "3000:80" # Expose port 80 (nginx default) to access the frontend at http://localhost:3000
-    volumes:
-      - ./frontend:/app # Optional: Bind mount for hot-reloading during development
 
   backend:
     image: backend # Use the backend image
@@ -16,9 +12,6 @@ services:
       dockerfile: Dockerfile # Use the Dockerfile in the backend folder
     ports:
       - "8000:8000" # Expose the backend API on port 8000
-    environment:
-      - PORT=8000
-      - CORS_ORIGIN=http://localhost:8000 # Set CORS to allow requests from frontend
     depends_on:
       - frontend # Ensure backend waits for frontend to build
     volumes:

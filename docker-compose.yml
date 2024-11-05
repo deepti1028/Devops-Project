@@ -1,0 +1,19 @@
+services:
+  frontend:
+    image: frontend # Use the frontend image
+    build:
+      context: ./frontend # Point to the frontend folder
+      dockerfile: Dockerfile # Use the Dockerfile in the frontend folder
+
+  backend:
+    image: backend # Use the backend image
+    build:
+      context: ./backend # Point to the backend folder
+      dockerfile: Dockerfile # Use the Dockerfile in the backend folder
+    ports:
+      - "8000:8000" # Expose the backend API on port 8000
+    depends_on:
+      - frontend # Ensure backend waits for frontend to build
+    volumes:
+      - ./backend:/app # Optional: Bind mount for backend development
+    command: npm start

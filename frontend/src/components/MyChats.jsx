@@ -25,7 +25,10 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
 
-      const { data } = await axios.get("http://localhost:5000/api/chat", config);
+      const { data } = await axios.get(
+        "http://localhost:8000/api/chat",
+        config
+      );
       // console.log("Data from Fetch Chats Function in MyChats.jsx: ", data.data);
       setChats(data.data);
     } catch (error) {
@@ -69,12 +72,25 @@ const MyChats = ({ fetchAgain }) => {
       >
         My Chats
         <GroupChatModal>
-          <Button display="flex" fontSize={{ base: "17px", md: "10px", lg: "17px" }} rightIcon={<AddIcon />}>
+          <Button
+            display="flex"
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
             New Group Chat
           </Button>
         </GroupChatModal>
       </Box>
-      <Box display="flex" flexDir="column" p={3} bg="#F8F8F8" w="100%" h="100%" borderRadius="lg" overflowY="hidden">
+      <Box
+        display="flex"
+        flexDir="column"
+        p={3}
+        bg="#F8F8F8"
+        w="100%"
+        h="100%"
+        borderRadius="lg"
+        overflowY="hidden"
+      >
         {chats ? (
           <Stack overflowY="scroll">
             {chats?.map((chat) => {
@@ -91,7 +107,11 @@ const MyChats = ({ fetchAgain }) => {
                   borderRadius="lg"
                   key={chat._id}
                 >
-                  <Text>{!chat.isGroupChat ? getSender(loggedUser, chat.users) : chat.chatName}</Text>
+                  <Text>
+                    {!chat.isGroupChat
+                      ? getSender(loggedUser, chat.users)
+                      : chat.chatName}
+                  </Text>
                   {chat.latestMessage && (
                     <Text fontSize="xs">
                       <b>{chat.latestMessage.sender.name} : </b>

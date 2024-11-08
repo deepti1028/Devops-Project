@@ -52,7 +52,7 @@ const Signup = () => {
         },
       };
       const { data } = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "http://localhost:8000/api/auth/register",
         {
           name,
           email,
@@ -62,6 +62,7 @@ const Signup = () => {
         config
       );
       console.log(data);
+      alert("Please verify your email and Login to Continue");
       toast({
         title: "Please verify your email and Login to Continue",
         status: "success",
@@ -102,7 +103,10 @@ const Signup = () => {
       data.append("pic", pics);
       console.log("Data: ", data);
       try {
-        const response = await axios.post("http://localhost:5000/api/auth/uploadPic", data);
+        const response = await axios.post(
+          "http://localhost:8000/api/auth/uploadPic",
+          data
+        );
         setPic(response.data.data.url);
         console.log("Pic url:", response.data.data.url);
         setPicLoading(false);
@@ -130,11 +134,18 @@ const Signup = () => {
     <VStack spacing="5px">
       <FormControl id="first-name" isRequired>
         <FormLabel>Name</FormLabel>
-        <Input placeholder="Enter Your Name" onChange={(e) => setName(e.target.value)} />
+        <Input
+          placeholder="Enter Your Name"
+          onChange={(e) => setName(e.target.value)}
+        />
       </FormControl>
       <FormControl id="email" isRequired>
         <FormLabel>Email Address</FormLabel>
-        <Input type="email" placeholder="Enter Your Email Address" onChange={(e) => setEmail(e.target.value)} />
+        <Input
+          type="email"
+          placeholder="Enter Your Email Address"
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </FormControl>
       <FormControl id="password" isRequired>
         <FormLabel>Password</FormLabel>
@@ -168,9 +179,20 @@ const Signup = () => {
       </FormControl>
       <FormControl id="pic">
         <FormLabel>Upload your Picture</FormLabel>
-        <Input type="file" p={1.5} accept="image/*" onChange={(e) => postDetails(e.target.files[0])} />
+        <Input
+          type="file"
+          p={1.5}
+          accept="image/*"
+          onChange={(e) => postDetails(e.target.files[0])}
+        />
       </FormControl>
-      <Button colorScheme="blue" width="100%" style={{ marginTop: 15 }} onClick={submitHandler} isLoading={picLoading}>
+      <Button
+        colorScheme="blue"
+        width="100%"
+        style={{ marginTop: 15 }}
+        onClick={submitHandler}
+        isLoading={picLoading}
+      >
         Sign Up
       </Button>
     </VStack>

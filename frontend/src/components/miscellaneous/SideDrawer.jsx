@@ -2,8 +2,20 @@ import { Button } from "@chakra-ui/button";
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
-import { Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/menu";
-import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay } from "@chakra-ui/modal";
+import {
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+} from "@chakra-ui/menu";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+} from "@chakra-ui/modal";
 import { Tooltip } from "@chakra-ui/tooltip";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Avatar } from "@chakra-ui/avatar";
@@ -26,7 +38,14 @@ function SideDrawer() {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
 
-  const { setSelectedChat, user, notification, setNotification, chats, setChats } = ChatState();
+  const {
+    setSelectedChat,
+    user,
+    notification,
+    setNotification,
+    chats,
+    setChats,
+  } = ChatState();
   // console.log(user);
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -58,7 +77,10 @@ function SideDrawer() {
         },
       };
 
-      const { data } = await axios.get(`http://localhost:5000/api/user?search=${search}`, config);
+      const { data } = await axios.get(
+        `http://localhost:8000/api/user?search=${search}`,
+        config
+      );
       // console.log("Data is : ", data);
       setLoading(false);
       // console.log("Search Result", data);
@@ -84,7 +106,11 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const res = await axios.post(`http://localhost:5000/api/chat`, { userId }, config);
+      const res = await axios.post(
+        `http://localhost:8000/api/chat`,
+        { userId },
+        config
+      );
       const data = res.data.data;
       // console.log("Inside AccessChat after requesting data, Data is : ", data);
       // console.log("chats : ", chats);
@@ -153,7 +179,12 @@ function SideDrawer() {
           </Menu>
           <Menu>
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
-              <Avatar size="sm" cursor="pointer" name={user.name} src={user.pic} />
+              <Avatar
+                size="sm"
+                cursor="pointer"
+                name={user.name}
+                src={user.pic}
+              />
             </MenuButton>
             <MenuList>
               <ProfileModal user={user}>
@@ -184,7 +215,13 @@ function SideDrawer() {
               <ChatLoading />
             ) : (
               searchResult?.map((user) => {
-                return <UserListItem key={user._id} user={user} handleFunction={() => accessChat(user._id)} />;
+                return (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => accessChat(user._id)}
+                  />
+                );
               })
             )}
             {loadingChat && <Spinner ml="auto" display="flex" />}

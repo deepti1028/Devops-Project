@@ -13,7 +13,7 @@ This is a simple chat application build for Devops Project to learn and implemen
 ### Steps
 
 1. Clone this repository
-2. Rename the .env.dev to .env and fill all the enviornment variables
+2. Rename the .env.example to .env and fill all the enviornment variables
 3. In the root folder run the command `docker-compose up`.
 
 Your server will be up and running on port 8000.

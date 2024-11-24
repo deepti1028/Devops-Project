@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import connectDB from "./config/connectDB.js";
 import { app } from "./app.js";
-import { chats } from "./data/data.js";
 
 dotenv.config({
   path: "./.env",
@@ -20,6 +19,6 @@ connectDB()
     console.log(err);
   });
 
-app.get("/", (req, res) => {
+app.get("/api/healthcheck", (req, res) => {
   return res.json({ message: "Welcome to Home route" });
 });

@@ -1,19 +1,33 @@
 services:
   frontend:
-    image: frontend # Use the frontend image
+    image: frontend
     build:
-      context: ./frontend # Point to the frontend folder
-      dockerfile: Dockerfile # Use the Dockerfile in the frontend folder
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks:
+      - app_network
+
+  mongodb:
+    image: mongo:4.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - app_network
 
   backend:
-    image: backend # Use the backend image
+    image: backend
     build:
-      context: ./backend # Point to the backend folder
-      dockerfile: Dockerfile # Use the Dockerfile in the backend folder
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000" # Expose the backend API on port 8000
+      - "8000:8000"
     depends_on:
-      - frontend # Ensure backend waits for frontend to build
-    volumes:
-      - ./backend:/app # Optional: Bind mount for backend development
+      - mongodb
+    networks:
+      - app_network
     command: npm start
+
+networks:
+  app_network:
+    driver: bridge

@@ -52,6 +52,10 @@ app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
 
+app.get("/api/healthcheck", (req, res) => {
+  return res.send("Server is running");
+});
+
 app.use(express.static(path.join(path.resolve(), "public", "dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(path.resolve(), "public", "dist", "index.html"));

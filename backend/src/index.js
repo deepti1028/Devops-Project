@@ -18,7 +18,3 @@ connectDB()
   .catch((err) => {
     console.log(err);
   });
-
-app.get("/api/healthcheck", (req, res) => {
-  return res.json({ message: "Welcome to Home route" });
-});

@@ -6,55 +6,74 @@ import { UnverifiedUser } from "../models/unverifiedUser.model.js";
 import { generateJWTToken } from "../utils/GenerateToken.js";
 import { uploadOnCloudinary } from "../config/cloudinary.js";
 import { sendConfirmationMail } from "../utils/sendMail.js";
+import logger from "../utils/logger.js";
 
 const uploadPicOnCloudinary = asyncHandler(async (req, res) => {
-  console.log("******** uploadPicOnCloudinary Function ********");
+  logger.debug("******** uploadPicOnCloudinary Function ********");
   const picLocalPath = req.files?.pic[0]?.path;
   console.log("Pic Local Path", picLocalPath);
   if (!picLocalPath) {
+    logger.error("No file uploaded");
     throw new ApiError(400, "No file uploaded");
   }
 
   const pic = await uploadOnCloudinary(picLocalPath);
   console.log("Pic URL", pic);
   if (!pic) {
+    logger.error("Failed to upload profile pic");
     throw new ApiError(500, "Failed to upload profile pic");
   }
 
-  return res.status(200).json(new ApiResponse(200, { url: pic }, "Profile pic uploaded successfully"));
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { url: pic }, "Profile pic uploaded successfully")
+    );
 });
 
 const registerUser = asyncHandler(async (req, res) => {
-  console.log("******** registerUser Function ********");
-  console.log("Request Body", req.body);
+  logger.debug("******** registerUser Function ********");
   const { name, email, password, pic } = req.body;
-  console.log("User details", name, email, password, pic);
+  logger.debug("User Details", name, email, password, pic);
   if (!name || !email || !password) {
+    logger.error("All fields are required");
     throw new ApiError(400, "All fields are required");
   }
 
   const existingUser = await User.findOne({ email });
-  console.log("Existing User", existingUser);
+  logger.debug("Existing User", existingUser);
   if (existingUser) {
+    logger.error("User already exists");
     throw new ApiError(400, "User already exists");
   }
 
   const existingUnverifiedUser = await UnverifiedUser.findOne({ email });
-  console.log("Existing Unverified User", existingUnverifiedUser);
+  logger.debug("Existing Unverified User", existingUnverifiedUser);
   if (existingUnverifiedUser) {
+    logger.error("Already registered. Please verify your email");
     throw new ApiError(400, "Already registered. Please verify your email");
   }
 
-  const unverifiedUser = await UnverifiedUser.create({ name, email, password, pic });
+  const unverifiedUser = await UnverifiedUser.create({
+    name,
+    email,
+    password,
+    pic,
+  });
 
   if (!unverifiedUser) {
+    logger.error("Failed to create User");
     throw new ApiError(500, "Failed to create User");
   }
 
-  const confirmationMail = await sendConfirmationMail(email, unverifiedUser._id);
+  const confirmationMail = await sendConfirmationMail(
+    email,
+    unverifiedUser._id
+  );
 
   if (!confirmationMail) {
     await UnverifiedUser.deleteOne({ _id: unverifiedUser._id });
+    logger.error("Failed to send confirmation mail");
     throw new ApiError(500, "Failed to send confirmation mail");
   }
 
@@ -72,14 +91,16 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const confirmEmail = asyncHandler(async (req, res) => {
-  console.log("******** confirmEmail Function ********");
+  logger.debug("******** confirmEmail Function ********");
   const { id } = req.params;
   if (!id) {
+    logger.error("Invalid request");
     throw new ApiError(400, "Invalid request");
   }
-  console.log("User ID", id);
+  logger.debug("User ID", id);
   const unverifiedUser = await UnverifiedUser.findById(id);
   if (!unverifiedUser) {
+    logger.error("User not found");
     throw new ApiError(404, "User not found");
   }
 
@@ -91,30 +112,33 @@ const confirmEmail = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
+    logger.error("Failed to create User");
     throw new ApiError(500, "Failed to create User");
   }
-  console.log("User Created", user);
+  logger.debug("User Created", user);
   await UnverifiedUser.deleteOne({ _id: unverifiedUser._id });
 
   return res.status(200).send("Email confirmed. You can now login");
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  console.log("******** loginUser Function ********");
+  logger.debug("******** loginUser Function ********");
   const { email, password } = req.body;
   if (!email || !password) {
+    logger.error("All fields are required");
     throw new ApiError(400, "All fields are required");
   }
 
-  console.log("User details", email, password);
+  logger.debug("User Details", email, password);
 
   const user = await User.findOne({ email });
 
   if (!user) {
+    logger.error("User does not exist");
     throw new ApiError(401, "User does not exist");
   }
 
-  console.log("User Details: ", user);
+  logger.debug("User Found", user);
 
   if (user && (await user.matchPassword(password))) {
     return res.status(200).json(
@@ -131,6 +155,7 @@ const loginUser = asyncHandler(async (req, res) => {
       )
     );
   }
+  logger.error("Invalid email or password");
   throw new ApiError(401, "Invalid email or password");
 });
 

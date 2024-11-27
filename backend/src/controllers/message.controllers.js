@@ -4,15 +4,22 @@ import { ApiError } from "../utils/ApiError.js";
 import { Chat } from "../models/chat.model.js";
 import { Message } from "../models/message.model.js";
 import { User } from "../models/user.model.js";
+import logger from "../utils/logger.js";
 
 const sendMessage = asyncHandler(async (req, res) => {
   console.log("******** sendMessage Function *********");
   const { chatId, content } = req.body;
-  if (!chatId || !content) throw new ApiError(400, "chatId and message is required");
+  if (!chatId || !content) {
+    logger.error("chatId and message is required");
+    throw new ApiError(400, "chatId and message is required");
+  }
 
   try {
     const chat = await Chat.findById(chatId);
-    if (!chat) throw new ApiError(404, "Chat not found");
+    if (!chat) {
+      logger.error("Chat not found");
+      throw new ApiError(404, "Chat not found");
+    }
 
     const newMessage = {
       sender: req.user._id,
@@ -20,7 +27,7 @@ const sendMessage = asyncHandler(async (req, res) => {
       chat: chatId,
     };
 
-    console.log("newMessage", newMessage);
+    logger.debug("New Message", newMessage);
 
     try {
       var message = await Message.create(newMessage);
@@ -31,7 +38,7 @@ const sendMessage = asyncHandler(async (req, res) => {
         select: "name pic email",
       });
 
-      console.log("message", message);
+      logger.debug("Message sent", message);
 
       await Chat.findByIdAndUpdate(req.body.chatId, {
         latestMessage: message,
@@ -39,11 +46,11 @@ const sendMessage = asyncHandler(async (req, res) => {
 
       res.status(200).json(new ApiResponse(200, message, "Message sent"));
     } catch (err) {
-      console.log("error", err);
+      logger.error("error", err);
       throw new ApiError(500, "Message not sent");
     }
   } catch (err) {
-    console.log("error", err);
+    logger.error("error", err);
     throw new ApiError(500, "Message not sent");
   }
 });
@@ -54,9 +61,11 @@ const allMessages = asyncHandler(async (req, res) => {
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "name pic email")
       .populate("chat");
-    return res.status(200).json(new ApiResponse(200, messages, "Messages retrieved"));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, messages, "Messages retrieved"));
   } catch (err) {
-    console.log("error", err);
+    logger.error("error", err);
     throw new ApiError(500, "Messages not found");
   }
 });

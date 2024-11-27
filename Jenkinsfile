@@ -16,6 +16,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Testing') {
+            steps {
+                dir('backend') {
+                    script {
+                        sh 'npm install'
+                        sh 'npm test'
+                    }
+                }
+            }
+        }
     }
     
     post {
